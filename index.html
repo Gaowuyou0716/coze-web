@@ -1,46 +1,57 @@
 <!doctype html>
-<html lang="zh‑CN">
+<html lang="zh-CN">
   <head>
-    <meta charset="UTF‑8" />
-    <meta name="viewport" content="width=device‑width, initial‑scale=1.0" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>习题训练智能体</title>
     <style>
       * {
         margin: 0;
         padding: 0;
-        box‑sizing: border‑box;
+        box-sizing: border-box;
       }
       html,
       body {
-        height: 100%;
         width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
       }
-      #coze‑container {
+      #coze-web-sdk-iframe {
         width: 100%;
         height: 100%;
+        border: none;
       }
     </style>
   </head>
   <body>
-    <div id="coze‑container"></div>
-
-    <!--加载扣子CDN JS SDK-->
-    <script src="https://lf‑cdn.coze.cn/obj/unpkg/latest/coze/web‑sdk/dist/js‑umd/index.min.js"></script>
+    <iframe id="coze-web-sdk-iframe" src="https://sdk.coze.site"></iframe>
     <script>
-      cozeWebSDK.init({
-        container: "#coze‑container",
-        projectId: "7707872629545435162",
-        //把引号内替换为你veFaaS部署页面拿到的Token
-        refreshToken: () =>
-          Promise.resolve(
-            "eyJhbGciOiJSUzI1NiIsImtpZCI6IjNmMzljOTM5LTQ4M2UtNGFiZi1hMWZkLTIxZjJkNGMyYWExYSJ9.eyJpc3MiOiJodHRwczovL2FwaS5jb3plLmNuIiwiYXVkIjpbIjBnR0dzMUhvanVqYUd3QldXaW5ObWVzT3lYVHlEN1NjIl0sImV4cCI6ODIxMDI2Njg3Njc5OSwiaWF0IjoxNzk0NjQ1ODMzLCJzdWIiOiJzcGlmZmU6Ly9hcGkuY296ZS5jbi93b3JrbG9hZF9pZGVudGl0eS9pZDo3NzA3OTQxNzc1NjcwNzcxNzIxIiwic3JjIjoiaW5ib3VuZF9hdXRoX2FjY2Vzc190b2tlbl9pZDo3NzA3OTQ1MTYxNTkzOTc4OTIzIn0.ig3W5ih3ICg0XahlvkS_kfhjsreqzziqroVJ53jwZ8tlqoZ1bhXauE7Bw1_HIAt9Au7zO-PCjIkCyPK9LFDTyAiADqAjiO07oft_ogUqHH02Mxc9vhoRDprqQ3n6Nf6mEzEaXamhX6ePV1NtdsEzNEQb1M1OoNJmVwiu_kGypVLUpBAWe4ipSb9e2XdOm6OQi-ghZcr8B-CDqo-WHAlV_3903vb70y3wAHfkQfcejSUQh2suuC4hstsJmXDpI-hr6yZfxTg8KWUDXw-y7CGbbZU1nkzZuzU2aCg_smZuBImb4UgqzKq4NwaacfTBY33nvsZZPCkvJsLn0dW13LMk-g",
-          ),
-        ui: {
-          header: {
-            isNeed: true,
-            title: "习题训练智能体",
-          },
-        },
+      const iframe = document.getElementById("coze-web-sdk-iframe");
+      const targetOrigin = "https://sdk.coze.site";
+
+      window.addEventListener("message", function (event) {
+        if (event.origin !== targetOrigin) return;
+        const data = event.data;
+
+        if (data.type === "IFRAME_READY") {
+          iframe.contentWindow.postMessage(
+            {
+              source: "host",
+              type: "INIT",
+              payload: {
+                projectId: "7707872629545435162",
+                token:
+                  "eyJhbGciOiJSUzI1NiIsImtpZCI6IjNmMzljOTM5LTQ4M2UtNGFiZi1hMWZkLTIxZjJkNGMyYWExYSJ9.eyJpc3MiOiJodHRwczovL2FwaS5jb3plLmNuIiwiYXVkIjpbIjBnR0dzMUhvanVqYUd3QldXaW5ObWVzT3lYVHlEN1NjIl0sImV4cCI6ODIxMDI2Njg3Njc5OSwiaWF0IjoxNzk0NjQ1ODMzLCJzdWIiOiJzcGlmZmU6Ly9hcGkuY296ZS5jbi93b3JrbG9hZF9pZGVudGl0eS9pZDo3NzA3OTQxNzc1NjcwNzcxNzIxIiwic3JjIjoiaW5ib3VuZF9hdXRoX2FjY2Vzc190b2tlbl9pZDo3NzA3OTQ1MTYxNTkzOTc4OTIzIn0.ig3W5ih3ICg0XahlvkS_kfhjsreqzziqroVJ53jwZ8tlqoZ1bhXauE7Bw1_HIAt9Au7zO-PCjIkCyPK9LFDTyAiADqAjiO07oft_ogUqHH02Mxc9vhoRDprqQ3n6Nf6mEzEaXamhX6ePV1NtdsEzNEQb1M1OoNJmVwiu_kGypVLUpBAWe4ipSb9e2XdOm6OQi-ghZcr8B-CDqo-WHAlV_3903vb70y3wAHfkQfcejSUQh2suuC4hstsJmXDpI-hr6yZfxTg8KWUDXw-y7CGbbZU1nkzZuzU2aCg_smZuBImb4UgqzKq4NwaacfTBY33nvsZZPCkvJsLn0dW13LMk-g",
+              },
+            },
+            targetOrigin,
+          );
+        }
+
+        if (data.type === "TOKEN_EXPIRED") {
+          // token过期，需要重新复制veFaaS新token替换这里再上传
+        }
       });
     </script>
   </body>
